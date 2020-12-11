@@ -1,6 +1,20 @@
 
+# Homework 8
+Weekly assignment about dimension reduction for linear regression
 
-# Exercise 1
+
+## Exercise 1
+
+Using the logarithm of y (i.e., of pop.rel.max.num) as response variable and the
+12 explanatory variables defined in Sec. 6.3 of the slides, use suitable variable selection and
+dimension reduction techniques including Partial Least Squares to improve the prediction
+quality of the model that was fitted on p.147/148 of the slides. Measure prediction quality
+of the logarithm of y, i.e., you don’t need to compare with any models that have the
+untransformed y as response variable. Compare in a way that is unaffected by selection
+bias such as double cross-validation. Also compare with a “mean only” model without any
+x-variable for log(y). 
+
+## Exercise 1
 
 
 ```r
@@ -218,97 +232,3 @@ kable(trial,caption = "number of variables")
 
 The number of variables included in the model are not always different from the case of the full model, this explains why the square loss function of the full model is slightly different from the one of the proposed models.
 In this case with such small number of variables and so little improvement a dimension reduction procedure perhaps it's not advisable.
-
-# Exercise 2
-
-$$
-\begin{aligned}
- \\[0,3in]
- \beta_c=(C'C)^{-1}C'Y=(XA'AX')^{-1}XA'Y=(XX')^{-1}XA'Y
-\end{aligned}
-$$
-
-# Exercise 3
-
-$$
-\begin{aligned}
- IF(X,P,T)&=\lim_{x\to\infty}\frac{T((1-\epsilon)E_p[(X)^2]+\epsilon\delta_x)-T(P)}{} \\
- &=\lim_{x\to\infty}\frac{(1-\epsilon)-1}{\epsilon}=-1
-\end{aligned}
-$$
-
-
-
-
-# Exercise 4
-
-
-```r
-crime <- read.csv("london-borough-profilesf.csv")
-
-
-i=1
-c=c()
-pb <- txtProgressBar(min = 0, max = 85, style = 3)
-```
-
-`
-
-```r
-while(i < 85){
-  if (class(crime[,i])=="factor"){
-    c=append(c,i)
-    i=i+1
-  }
-  else{
-    i=i+1
-  }
-  setTxtProgressBar(pb, i)
-}
-```
-
-
-```r
-crime_new=crime[,-c]
-crime_new=crime_new[,-c(31,32)]
-crime_new=crime_new[,-c(66,65,60,21,22,27,31,33,47,50,52)]
-
-crime_new=crime_new[,-c(6,7,8,3,10,11,12,13,14,15,16,17,18,19,20,22,23,24,25,
-                        26,27,28,29,30,36,37,38,39,40,41,43,44,45,45,46,
-                        48,49,57,58,59,60)]
-crime_new$GLA=(crime_new$GLA.Population.Estimate.2015+crime_new$GLA.Household.Estimate.2015)/2
-crime_new$NoAnxiety.score.2011.14..out.of.10.=10-crime_new$Anxiety.score.2011.14..out.of.10.
-crime_new$Psychological_status=(crime_new$Life.satisfaction.score.2011.14..out.of.10.+
-                                  crime_new$Worthwhileness.score.2011.14..out.of.10.+
-                                  crime_new$NoAnxiety.score.2011.14..out.of.10.+crime_new$Happiness.score.2011.14..out.of.10.)/4
-crime_new$life.expectancy=(crime_new$Female.life.expectancy...2011.13.+
-                             crime_new$Male.life.expectancy...2011.13.)/2
-
-crime_new=crime_new[,-c(22,1:2,14:15,16:19)]
-
-names(crime_new)
-```
-
-```
-##  [1] "Population.density..per.hectare..2015"             
-##  [2] "Average.Age..2015"                                 
-##  [3] "Net.internal.migration..2014."                     
-##  [4] "Unemployment.rate..2014."                          
-##  [5] "Two.year.business.survival.rates..started.in.2011."
-##  [6] "Crime.rates.per.thousand.population.2014.15"       
-##  [7] "Fires.per.thousand.population..2014."              
-##  [8] "Ambulance.incidents.per.hundred.population..2014." 
-##  [9] "Median.House.Price..2014"                          
-## [10] "Total.carbon.emissions..2013."                     
-## [11] "Rates.of.Children.Looked.After..2014."             
-## [12] "Mortality.rate.from.causes.considered.preventable" 
-## [13] "GLA"                                               
-## [14] "Psychological_status"                              
-## [15] "life.expectancy"
-```
-
-This are the variables 15 that I suggest to include in the model. A lot of variables have been excluded because they are irrelavant or don't add much information to the variables considered. 12 variables are the original ones and 3 are the result of combining the original variables to obtain an indicator that can summarize them:
-
--GLA is given by  (GLA.Population.Estimate.2015 + GLA.Household.Estimate.2015)/2
--Psychological_status is given by  (Worthwhileness.score + Happiness.score + (10- Anxiety.score) + Life.satisfaction.score)/4.
--life.expectancy is given by (Male.life.expectancy+Female.life.expectancy)/2
